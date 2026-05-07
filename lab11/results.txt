@@ -1,0 +1,58 @@
+time ./cache_test seq:
+sum = 87960909250560
+
+real    0m0.129s
+user    0m0.118s
+sys     0m0.006s
+
+sum = 87960909250560
+
+real    0m0.193s
+user    0m0.182s
+sys     0m0.010s
+
+
+Різниця: 
+
+real    0m0.07s
+user    0m0.07s
+sys     0m0.004s
+
+
+valgrind --tool=cachegrind --cache-sim=yes ./cache_test seq 2>&1 | tail -30
+==25434== D refs:        276,877,990  (272,671,297 rd   + 4,206,693 wr)
+==25434== D1  misses:      2,885,295  (  2,622,747 rd   +   262,548 wr)
+==25434== LLd misses:        263,583  (      1,076 rd   +   262,507 wr)
+==25434== D1  miss rate:         1.0% (        1.0%     +       6.2%  )
+==25434== LLd miss rate:         0.1% (        0.0%     +       6.2%  )
+
+
+valgrind --tool=cachegrind --cache-sim=yes ./cache_test rand 2>&1 | tail -30
+==26010== D refs:        276,893,350  (272,684,097 rd   + 4,209,253 wr)
+==26010== D1  misses:     42,206,886  ( 41,944,338 rd   +   262,548 wr)
+==26010== LLd misses:        263,584  (      1,077 rd   +   262,507 wr)
+==26010== D1  miss rate:        15.2% (       15.4%     +       6.2%  )
+==26010== LLd miss rate:         0.1% (        0.0%     +       6.2%  )
+
+
+=== Частина 4: Row-major vs Column-major (4096x4096) ===
+time row
+real    0m0.046s
+user    0m0.042s
+sys     0m0.003s
+
+time col 
+real    0m0.077s
+user    0m0.070s
+sys     0m0.003s
+
+D1 miss rate (row): 1.0%
+D1 miss rate (col): 16.7%%
+
+
+4.3 
+1. У C масиви зберігаються рядок за рядком (row-major). Коли ми читаємо рядки по порядку, CPU кешує сусідні елементи — тому швидко.
+2.Row-major: 1 елемент (4 байти)
+Column-major: N елементів (4096 × 4 = 16384 байт)
+3. Cache line = 64 байти → 64 / 4 = 16 елементів int
+4. Коли ми читаємо 16 елементів підряд, перший елемент це промах у кеші, а решта 15 елементів це попадання в кеш.
