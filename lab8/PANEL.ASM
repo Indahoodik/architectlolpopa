@@ -3,7 +3,7 @@
 
 .DATA
 title   DB ' My Panel ', 0
-msg1    DB 'Name: Artur', 0
+msg1    DB 'Name: Alex', 0
 msg2    DB 'Group: CS-XX', 0
 msg3    DB 'Course: Computer Systems Architecture', 0
 msg4    DB 'Lab: 08 - Video Memory', 0
